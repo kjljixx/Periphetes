@@ -2,18 +2,18 @@ import java.util.Arrays;
 
 public class AIPlayer extends Player{
     public double blockedType(Board board, int x, int y, int stm){
-        if(x < 0){return 0;}
-        if(x >= board.getSize()){return 0;}
-        if(y < 0){return 0;}
-        if(y >= board.getSize()){return 0;}
+        if(x < 0){return 1;}
+        if(x >= board.getSize()){return 1;}
+        if(y < 0){return 1;}
+        if(y >= board.getSize()){return 1;}
         int state = board.getBoard()[y][x];
         if(state == stm){
-            return 2;
+            return 0;
         }
         if(state == 0){
-            return 1;
+            return 0;
         }
-        return 0;
+        return 1;
     }
     public double simulate(Board board){
         boolean notFull = false;
@@ -23,37 +23,54 @@ public class AIPlayer extends Player{
                 for(int x=0; x<board.getSize(); x++){
                     int currY = y;
                     int currX = x;
-                    for(int i=0; i<5; i++){
+                    double otherEndBlockedType = blockedType(board, currX - adjIncr[1], currY - adjIncr[0], board.getBoard()[currY][currX]);
+                    for(int i=0; i<6; i++){
+                        int[][] stmVals =
+                                {
+                                        {0, 0, 100, 2000, 10000000, 200000000},
+                                        {0, 0, 10, 200, 10000000, 200000000},
+                                        {0, 0, 0, 0, 0, 200000000}
+                                };
+                        int[][] otherVals =
+                                {
+                                        {0, 0, 10, 200, 1000000, 200000000},
+                                        {0, 0, 5, 50, 100, 2000, 200000000},
+                                        {0, 0, 0, 0, 0, 200000000}
+                                };
                         if(currY >= board.getSize()){
-                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? i*i*i*i*i : -i*i*i)*(blockedType(board, currX, currY, board.getStm()));
+                            int blockedIdx = (int)(blockedType(board, currX, currY, board.getBoard()[y][x])+otherEndBlockedType);
+                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? stmVals[blockedIdx][i] : -otherVals[blockedIdx][i]);
                             break;
                         }
                         if(currY < 0){
-                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? i*i*i*i*i : -i*i*i)*(blockedType(board, currX, currY, board.getStm()));
+                            int blockedIdx = (int)(blockedType(board, currX, currY, board.getBoard()[y][x])+otherEndBlockedType);
+                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? stmVals[blockedIdx][i] : -otherVals[blockedIdx][i]);
                             break;
                         }
                         if(currX >= board.getSize()){
-                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? i*i*i*i*i : -i*i*i)*(blockedType(board, currX, currY, board.getStm()));
+                            int blockedIdx = (int)(blockedType(board, currX, currY, board.getBoard()[y][x])+otherEndBlockedType);
+                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? stmVals[blockedIdx][i] : -otherVals[blockedIdx][i]);
                             break;
                         }
                         if(currX < 0){
-                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? i*i*i*i*i : -i*i*i)*(blockedType(board, currX, currY, board.getStm()));
+                            int blockedIdx = (int)(blockedType(board, currX, currY, board.getBoard()[y][x])+otherEndBlockedType);
+                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? stmVals[blockedIdx][i] : -otherVals[blockedIdx][i]);
                             break;
                         }
 
-                        if(board.getBoard()[currY][currX] != 0) {
+                        if(board.getBoard()[currY][currX] != 0 && i==0) {
                             eval += board.getBoard()[currY][currX] == board.getStm() ? board.getSize()/2.0-Math.abs(currY-board.getSize()/2.0)+board.getSize()/2.0-Math.abs(currX-board.getSize()/2.0) :
                                     -(board.getSize()/2.0-Math.abs(currY-board.getSize()/2.0)+board.getSize()/2.0-Math.abs(currX-board.getSize()/2.0));
                         }
-                        if(i != 0 && board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] != board.getBoard()[currY][currX]){
-                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? i*i*i*i*i : -i*i*i)*(blockedType(board, currX, currY, board.getStm()));
+                        if((i != 0 && board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] != board.getBoard()[currY][currX]) || i == 5){
+                            int blockedIdx = (int)(blockedType(board, currX, currY, board.getBoard()[y][x])+otherEndBlockedType);
+                            eval += (board.getBoard()[currY-adjIncr[0]][currX-adjIncr[1]] == board.getStm() ? stmVals[blockedIdx][i] : -otherVals[blockedIdx][i]);
                             break;
                         }
 
-                        if(board.getBoard()[currY][currX] == 0){notFull = true; break;}
-
-                        if(i == 4){
-                            return board.getBoard()[currY][currX] == board.getStm() ? 100000000 : -100000000;
+                        if(board.getBoard()[currY][currX] == 0){
+                            notFull = true;
+                            break;
                         }
 
                         currY += adjIncr[0];

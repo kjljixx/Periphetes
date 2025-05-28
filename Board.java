@@ -152,7 +152,7 @@ public class Board {
         str += ANSI_RESET + ANSI_PURPLE + "\n0  " + ANSI_RESET;
         for(int y=0; y<size; y++){
             for(int x=0; x<size; x++){
-                str += (changedBoard[y][x] == 1 ? ANSI_RED : (changedBoard[y][x] == 2 ? ANSI_YELLOW : "")) + (changedBoard[y][x] == -1 ? ANSI_BLUE : (changedBoard[y][x] == 2 ? ANSI_YELLOW : "")) + (changedBoard[y][x] < 0 ? "" : " ") + board[y][x] + ANSI_RESET + " ";
+                str += (changedBoard[y][x] == 1 ? ANSI_RED : (changedBoard[y][x] == 2 ? ANSI_YELLOW : "")) + (changedBoard[y][x] == -1 ? ANSI_BLUE : (changedBoard[y][x] == -2 ? ANSI_YELLOW : "")) + (changedBoard[y][x] < 0 ? "" : " ") + board[y][x] + ANSI_RESET + " ";
             }
             if(y != size-1) {
                 str += "\n" + ANSI_PURPLE + (y+1) + ANSI_RESET;
